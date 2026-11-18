@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"name": "Ollama",
+			"path": "./ollama"
+		},
+		{
+			"name": "OpenAI",
+			"path": "./openai"
+		}
+	],
+	"settings": {}
+}
