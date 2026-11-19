@@ -3,3 +3,5 @@
 今は下記のAI開発用テストサンプルが入っている  
 
 - ollama ... Ollama + llama3.2 のオフラインAIテストサンプル
+- ollama_2 ... Ollama + llama3.2 で簡単なデータセットを使ったテストサンプル
+- openai ... OpenAIを使ったテストサンプル
