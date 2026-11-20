@@ -89,6 +89,7 @@ func Ques() {
 	fmt.Println("QUE START.")
 	fmt.Println("")
 
+	// データ内容をAIに読み込み
 	Begin()
 
 	// 処理をループ

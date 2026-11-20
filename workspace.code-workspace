@@ -13,6 +13,10 @@
 			"path": "./ollama_2"
 		},
 		{
+			"name": "Ollama_3",
+			"path": "./ollama_3"
+		},
+		{
 			"name": "OpenAI",
 			"path": "./openai"
 		},
