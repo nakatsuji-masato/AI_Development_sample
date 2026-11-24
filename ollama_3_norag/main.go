@@ -26,32 +26,30 @@ type ChatResponse struct {
 	Done    bool    `json:"done"`
 }
 
-var msg = []Message{}
-
 const url = "http://localhost:11434/api/chat"
 
 const llmModel = "llama3.2"
 
 func main() {
-	fmt.Println("--- Ollama AI Model Test Sample 3 ----")
+	fmt.Println("--- Ollama AI Model Test Sample 4(RAG) ----")
 	fmt.Println("LLM = " + llmModel)
 	fmt.Println("")
 
-	// AIに規則性データを読み込み
-	Begin()
-
 	// 処理をループ
 	for {
+
+		var msg = []Message{}
+
 		// 入力メッセージを取得
 		fmt.Print("Please Question: ")
-		var question string
-		_, err := fmt.Scan(&question)
+		var query string
+		_, err := fmt.Scan(&query)
 		if err != nil {
 			panic(err)
 		}
 
 		// AIへ入力メッセージを送信
-		res, err := Ollama(question, "user")
+		res, err := question(query, msg)
 
 		if err != nil {
 			panic(err)
@@ -65,40 +63,71 @@ func main() {
 
 }
 
-// AIに規則性を読み込み
-func Begin() {
+func question(question string, msg []Message) (*ChatResponse, error) {
 
-	now := time.Now().Format("2006-01-02 15:04:05")
-	week := time.Now().Weekday().String()
-
-	rules, err := os.ReadFile("./rules.json")
+	catList, err := os.ReadFile("./category.json")
 	if err != nil {
 		panic(err)
 	}
 
-	//	fmt.Println(now + " " + week)
+	p0 := fmt.Sprintf(`
+あなたは商品カテゴリを分類するアシスタントです。
 
-	str := `
-以下の規則データに従って回答してください。
+カテゴリリスト:
+%s
 
-ただし優先度の高い情報を順に記載しています。
-・現在日時: ` + now + `
-・現在曜日: ` + week + `
-・下記の規則データを準拠する
-` + string(rules)
+質問:
+%s
 
-	_, err = Ollama(str, "user")
+ルール：
+1. 必ず上記5つのカテゴリリストから2つだけ選択すること。
+2. 該当するカテゴリが判断できない場合は「その他」を選択すること。
+3. 説明文は不要。
+4. JSON形式のみで回答すること。
+
+回答形式：
+["カテゴリ名1","カテゴリ名2"]`, catList, question)
+
+	res, err := Ollama(msg, p0, "user")
 	if err != nil {
 		panic(err)
 	}
 
-	//	fmt.Println(res.Message.Content)
+	items, err := os.ReadFile("./data.json")
 
-	fmt.Print("....Read Rule OK.\n")
+	if err != nil {
+		panic(err)
+	}
+
+	p1 := fmt.Sprintf(`
+あなたは商品検索を分類するAIです。
+	
+カテゴリ:
+%s
+
+商品データ:
+%s
+
+質問:
+%s
+
+ルール：
+1. 上記カテゴリに該当する商品情報より質問内容に合致する商品を1つ選択し、上記質問内容に回答すること
+
+回答形式:
+自由(商品名、価格、概要など文章は考えてください)
+`, res.Message.Content, items, question)
+
+	res2, err := Ollama(msg, p1, "user")
+	if err != nil {
+		panic(err)
+	}
+
+	return res2, err
 }
 
 // Ollamaへのリクエスト
-func Ollama(message string, role string) (*ChatResponse, error) {
+func Ollama(msg []Message, message string, role string) (*ChatResponse, error) {
 
 	// メッセージリストに追加
 	msg = append(msg, Message{
