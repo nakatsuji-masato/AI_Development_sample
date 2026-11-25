@@ -13,8 +13,16 @@
 			"path": "./ollama_2"
 		},
 		{
-			"name": "Ollama_3",
-			"path": "./ollama_3"
+			"name": "Ollama_3_NORAG",
+			"path": "./ollama_3_norag"
+		},
+		{
+			"name": "Ollama_4_RAG",
+			"path": "./ollama_4_rag"
+		},
+		{
+			"name": "Ollama_5_keywords",
+			"path": "./ollama_5_keywords"
 		},
 		{
 			"name": "OpenAI",
